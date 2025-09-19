@@ -9,32 +9,32 @@ clients = [
 result = []
 
 for client in clients:
-    імя = client["ім’я"]
-    сума = client["сума угоди"]
-    статус = client["статус перевірки"]
+    name = client["name"]
+    amount = client["deal_amount"]
+    status = client["status"]
 
-    if not isinstance(сума, (int, float)):
-        категорія = "Фальшиві дані"
-        рішення = "—"
+    if not isinstance(amount, (int, float)):
+        category = "Invalid data"
+        decision = "—"
     else:
-        if сума < 100:
-            категорія = "Дрібнота"
-        elif сума < 1000:
-            категорія = "Середнячок"
+        if amount < 100:
+            category = "Small client"
+        elif amount < 1000:
+            category = "Medium client"
         else:
-            категорія = "Великий клієнт"
+            category = "Big client"
 
-        match статус:
+        match status:
             case "clean":
-                рішення = "Працювати без питань"
+                decision = "Proceed without issues"
             case "suspicious":
-                рішення = "Перевірити документи"
+                decision = "Check documents"
             case "fraud":
-                рішення = "У чорний список"
+                decision = "Blacklist"
             case _:
-                рішення = "Невідомий статус"
+                decision = "Unknown status"
 
-    result.append(f"{імя}: {категорія} → {рішення}")
+    result.append(f"{name}: {category} → {decision}")
 
 for i in result:
     print(i)

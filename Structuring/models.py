@@ -7,14 +7,14 @@ class Medicine(ABC):
         self.price = float(price)
 
     def total_price(self):
-        return self.quantity * self.price * 1.1
+        return self.quantity * self.price * 1.1  
 
     def info(self):
-        return (f"{self.name} | Кількість: {self.quantity} | "
-                f"Ціна за одиницю: {self.price:.2f} | "
-                f"Разом: {self.total_price():.2f} | "
-                f"Рецепт: {self.requires_prescription()} | "
-                f"Зберігання: {self.storage_requirements()}")
+        return (f"{self.name} | Quantity: {self.quantity} | "
+                f"Price per unit: {self.price:.2f} | "
+                f"Total: {self.total_price():.2f} | "
+                f"Prescription required: {self.requires_prescription()} | "
+                f"Storage: {self.storage_requirements()}")
 
     @abstractmethod
     def requires_prescription(self):
@@ -23,21 +23,24 @@ class Medicine(ABC):
     @abstractmethod
     def storage_requirements(self):
         pass
+
 
 class Antibiotic(Medicine):
     def requires_prescription(self):
         return True
     def storage_requirements(self):
-        return "8–15°C, темне місце"
+        return "8–15°C, dark place"
+
 
 class Vitamin(Medicine):
     def requires_prescription(self):
         return False
     def storage_requirements(self):
-        return "15–25°C, сухо"
+        return "15–25°C, dry place"
+
 
 class Vaccine(Medicine):
     def requires_prescription(self):
         return True
     def storage_requirements(self):
-        return "2–8°C, холодильник"
+        return "2–8°C, refrigerator"
