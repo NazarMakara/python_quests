@@ -1,94 +1,58 @@
-prluklad = input("Введіть вираз: ")
-all_signs = "+-*/"
+prl = input("Enter: ").replace(" ", "")
 
-inside = ""
-outside = ""
-mode = False
-for i in prluklad:
-    if i == "(":
-        mode = True
-        continue
-    if i == ")":
-        mode = False
-        continue
-    if mode:
-        inside = inside + i
-    else:
-        outside = outside + i
-
-nums = []
-ops = []
-num = ""
-for i in inside:
-    if i in all_signs:
+def fun(prl):
+    nums = []
+    ops = []
+    num = ""
+    
+    i = 0
+    while i < len(prl):
+        if prl[i] in "+-*/":
+            if num:
+                nums.append(float(num))
+                num = ""
+            ops.append(prl[i])
+            i += 1
+        elif prl[i] == "(":
+            count = 1
+            j = i + 1
+            while j < len(prl) and count > 0:
+                if prl[j] == "(":
+                    count += 1
+                elif prl[j] == ")":
+                    count -= 1
+                j += 1
+            if count == 0:
+                sub_prl = prl[i+1:j-1]
+                sub_result = fun(sub_prl)
+                nums.append(sub_result)
+            i = j
+        else:
+            num += prl[i]
+            i += 1
+    
+    if num:
         nums.append(float(num))
-        ops.append(i)
-        num = ""
-    else:
-        num = num + i
-if num != "":
-    nums.append(float(num))
+    
+    i = 0
+    while i < len(ops):
+        if ops[i] == "*":
+            nums[i] = nums[i] * nums[i+1]
+            del nums[i+1]
+            del ops[i]
+        elif ops[i] == "/":
+            nums[i] = nums[i] / nums[i+1]
+            del nums[i+1]
+            del ops[i]
+        else:
+            i += 1
+    
+    res = nums[0]
+    for i in range(len(ops)):
+        if ops[i] == "+":
+            res += nums[i+1]
+        elif ops[i] == "-":
+            res -= nums[i+1]
+    return res
 
-new_nums = [nums[0]]
-new_ops = []
-for i in range(len(ops)):
-    if ops[i] == "*":
-        new_nums[-1] = new_nums[-1] * nums[i+1]
-    elif ops[i] == "/":
-        new_nums[-1] = new_nums[-1] / nums[i+1]
-    else:
-        new_ops.append(ops[i])
-        new_nums.append(nums[i+1])
-
-res_inside = new_nums[0]
-for i in range(len(new_ops)):
-    if new_ops[i] == "+":
-        res_inside = res_inside + new_nums[i+1]
-    elif new_ops[i] == "-":
-        res_inside = res_inside - new_nums[i+1]
-
-prluklad2 = ""
-mode = False
-for i in prluklad:
-    if i == "(":
-        mode = True
-        prluklad2 = prluklad2 + str(res_inside)
-        continue
-    if i == ")":
-        mode = False
-        continue
-    if not mode:
-        prluklad2 = prluklad2 + i
-
-nums = []
-ops = []
-num = ""
-for i in prluklad2:
-    if i in all_signs:
-        nums.append(float(num))
-        ops.append(i)
-        num = ""
-    else:
-        num = num + i
-if num != "":
-    nums.append(float(num))
-
-new_nums = [nums[0]]
-new_ops = []
-for i in range(len(ops)):
-    if ops[i] == "*":
-        new_nums[-1] = new_nums[-1] * nums[i+1]
-    elif ops[i] == "/":
-        new_nums[-1] = new_nums[-1] / nums[i+1]
-    else:
-        new_ops.append(ops[i])
-        new_nums.append(nums[i+1])
-
-res_outside = new_nums[0]
-for i in range(len(new_ops)):
-    if new_ops[i] == "+":
-        res_outside = res_outside + new_nums[i+1]
-    elif new_ops[i] == "-":
-        res_outside = res_outside - new_nums[i+1]
-
-print("Результат всього виразу:", res_outside)
+print("Result:",fun(prl))
