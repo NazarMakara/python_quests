@@ -1,35 +1,57 @@
 import concurrent.futures
 import time
 import random
+import os
+from pathlib import Path
 
-FILES_TO_PROCESS = range(1, 11)
-MAX_WORKERS = 4
+FILE_NAMES = [f"data_task_{i}.txt" for i in range(1, 11)] 
+MAX_WORKERS = 4 
+TEST_CONTENT = "word" * 10
 
-def process_file(file_id):
+def create_test_files():
+    for name in FILE_NAMES:
+        with open(name, 'w') as f:
+            f.write(TEST_CONTENT)
+
+def cleanup_files():
+    for name in FILE_NAMES:
+        file_path = Path(name)
+        if file_path.exists():
+            os.remove(file_path)
+
+def process_file(file_name):
+    with open(file_name, 'r') as f:
+        content = f.read()
+        
     work_time = random.uniform(0.2, 0.6)
     time.sleep(work_time)
 
-    if file_id == 5:
-        raise Exception(f"File {file_id}")
+    if "data_task_5" in file_name:
+        raise Exception("Помилка обробки")
 
-    return f"File {file_id}|{work_time:.2f} sec"
+    return f"Файл {file_name} оброблено за {work_time:.2f} сек"
 
 if __name__ == "__main__":
+    create_test_files()
     results = []
     errors = []
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as pool:
+    try:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as pool:
 
-        tasks = {pool.submit(process_file, file_id): file_id for file_id in FILES_TO_PROCESS}
+            tasks = {pool.submit(process_file, file_name): file_name for file_name in FILE_NAMES}
 
-        for future in concurrent.futures.as_completed(tasks):
-            file_id = tasks[future]
-            try:
-                data = future.result()
-                results.append(data)
-            except Exception as error:
-                errors.append(f"File {file_id} failed")
+            for future in concurrent.futures.as_completed(tasks):
+                file_name = tasks[future]
+                try:
+                    data = future.result()
+                    results.append(data)
+                except Exception as error:
+                    errors.append(f"Файл {file_name} ЗБІЙ")
     
+    finally:
+        cleanup_files()
+        
     for i in sorted(results):
         print(i)
 
